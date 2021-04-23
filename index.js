@@ -6,7 +6,7 @@ const argParser = require("args-parser");
 const args = argParser(process.argv);
 
 const siteUrl = args.url || process.env["URL"];
-const blacklist = args.ignore.split(",") || process.env["IGNORE"].split(",") || [];
+const blacklist = (args.ignore || process.env["IGNORE"] || "").split(",");
 const timeout = args.timeout || parseInt(process.env["TIMEOUT"]) || 600;
 const sender = args.sender_email || process.env["SENDER_EMAIL"];
 const senderPassword = args.sender_password || process.env["SENDER_PASSWORD"];
@@ -23,6 +23,7 @@ if (!siteUrl || !sender || !senderPassword || !recipient) {
     console.log("\t--recipient\t\tThe Gmail account receiving the report");
     console.log();
     console.log("\tYou may prefer to provide these values through environment variables of the same name (but in upper case).");
+    process.exit(1);
 }
 
 let timeoutTimer;
