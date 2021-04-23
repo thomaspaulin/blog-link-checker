@@ -1,10 +1,31 @@
+#!/usr/bin/env node
 const {SiteChecker} = require('broken-link-checker');
 const {SMTPClient} = require('emailjs');
+const argParser = require("args-parser");
+
+const args = argParser(process.argv);
+
+const siteUrl = args.url || process.env["URL"];
+const blacklist = args.ignore.split(",") || process.env["IGNORE"].split(",") || [];
+const timeout = args.timeout || parseInt(process.env["TIMEOUT"]) || 600;
+const sender = args.sender_email || process.env["SENDER_EMAIL"];
+const senderPassword = args.sender_password || process.env["SENDER_PASSWORD"];
+const recipient = args.recipient || process.env["RECIPIENT"];
+
+
+if (!siteUrl || !sender || !senderPassword || !recipient) {
+    console.log("Usage: link-checker --url=<url> --ignore=<url1>,<url2> --timeout=600 --sender=<send@gmail.com> --sender_password=<password> --recipient=<receive@gmail.com>");
+    console.log("\t--url\t\t\tURL of the site to crawl for links");
+    console.log("\t--ignore\t\tA comma separated list of hosts considered reliable. Don't check these links");
+    console.log("\t--timeout\t\tThe timeout of the crawler in seconds");
+    console.log("\t--sender\t\tThe Gmail account sending the report");
+    console.log("\t--sender_password\tThe password of the Gmail account sending the report");
+    console.log("\t--recipient\t\tThe Gmail account receiving the report");
+    console.log();
+    console.log("\tYou may prefer to provide these values through environment variables of the same name (but in upper case).");
+}
 
 let timeoutTimer;
-const siteUrl = process.env["URL"];
-const blacklist = process.env["IGNORE"].split(",");
-const timeout = parseInt(process.env["TIMEOUT"]);
 const broken = {};
 
 function buildEmailTemplate(site, broken) {
@@ -22,10 +43,6 @@ function buildEmailTemplate(site, broken) {
 }
 
 function email(site, broken) {
-    const sender = process.env["SENDER_EMAIL"];
-    const senderPassword = process.env["SENDER_PASSWORD"];
-    const recipient = process.env["RECIPIENT"];
-
     const client = new SMTPClient({
         user: sender,
         password: senderPassword,

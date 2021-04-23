@@ -4,13 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "args-parser": "^1.1.0",
     "broken-link-checker": "^0.7.8",
     "emailjs": "^3.4.0"
+  },
+  "bin": {
+    "link-checker": "./index.js"
   }
 }
