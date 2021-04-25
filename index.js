@@ -18,7 +18,7 @@ if (!siteUrl || !sender || !senderPassword || !recipient) {
     console.log("\t--url\t\t\tURL of the site to crawl for links");
     console.log("\t--ignore\t\tA comma separated list of hosts considered reliable. Don't check these links");
     console.log("\t--timeout\t\tThe timeout of the crawler in seconds");
-    console.log("\t--sender\t\tThe Gmail account sending the report");
+    console.log("\t--sender_email\t\tThe Gmail account sending the report");
     console.log("\t--sender_password\tThe password of the Gmail account sending the report");
     console.log("\t--recipient\t\tThe Gmail account receiving the report");
     console.log();
