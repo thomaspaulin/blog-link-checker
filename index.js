@@ -86,7 +86,6 @@ function handleLink(result, customData) {
     // todo what if the status code is 200 but it's actually a page displaying a 404 or other error?
     // todo what if the link isn't broken but is redirecting to somewhere which is not the content intended as the link?
     // todo improve blacklist performance
-    console.log(result)
     if (result.broken && !isBlacklisted(result.url, customData.blacklist)) {
         const sourceUrl = result.base.original;
         const brokenLinks = broken[sourceUrl] || [];
