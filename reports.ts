@@ -1,8 +1,13 @@
+export interface BrokenInformation {
+    linkText: string;
+    reason?: string;
+}
+
 export class PageReport {
     readonly url: string;
     checked: Set<string>;
     broken: Set<string>;
-    brokenLinkTitles: Map<string, string>;
+    brokenInfo: Map<string, BrokenInformation>;
     ignored: Set<string>;
     blacklisted: Set<string>;
 
@@ -10,15 +15,18 @@ export class PageReport {
         this.url = url;
         this.checked = new Set<string>();
         this.broken = new Set<string>();
-        this.brokenLinkTitles = new Map<string, string>();
+        this.brokenInfo = new Map<string, BrokenInformation>();
         this.ignored = new Set<string>();
         this.blacklisted = new Set<string>();
     }
 
-    reportBroken(link: string, title: string) {
+    reportBroken(link: string, linkText: string, reason: string) {
         this.reportChecked(link);
         this.broken.add(link);
-        this.brokenLinkTitles.set(link, title);
+        this.brokenInfo.set(link, {
+            linkText: linkText,
+            reason: reason,
+        });
     }
 
     reportIgnored(link: string) {

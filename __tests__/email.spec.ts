@@ -44,14 +44,14 @@ describe("Email sending and formatting", () => {
             })
 
             it("should use the correct singular grammar", () => {
-                pr.reportBroken("title", l);
+                pr.reportBroken(l, "title", "HTTP_404");
 
                 const summary = buildPageSummary(url, pr);
                 expect(summary).toMatch("I checked <strong>1</strong> link. <strong>1</strong> was broken");
             });
             it("should use the correct plural grammar", () => {
-                pr.reportBroken("title", l);
-                pr.reportBroken("title 2", l2);
+                pr.reportBroken(l, "title", "HTTP_404");
+                pr.reportBroken(l2, "title 2", "UNKNOWN");
 
                 const summary = buildPageSummary(url, pr);
                 expect(summary).toMatch("I checked <strong>2</strong> links. <strong>2</strong> were broken");
@@ -107,7 +107,7 @@ describe("Email sending and formatting", () => {
 
             beforeEach(() => {
                 pr = new PageReport(url)
-                pr.reportBroken(l, "title");
+                pr.reportBroken(l, "title", "HTTP_404");
                 pr.reportChecked(l2);
             })
 
@@ -138,9 +138,9 @@ describe("Email sending and formatting", () => {
     describe("The summary list", () => {
         it("should mention the link text, and the reference", () => {
             const pr = new PageReport(url);
-            pr.reportBroken(l, "link title");
+            pr.reportBroken(l, "link title", "HTTP_404");
             const summary = buildPageSummary(url, pr);
-            expect(summary).toMatch(`<li>"link title" - ${l}</li>`);
+            expect(summary).toMatch(`<li>"link title" - ${l} (HTTP_404)</li>`);
         });
     });
 });

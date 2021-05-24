@@ -45,7 +45,11 @@ export function buildPageSummary(pageUrl: string, pageReport: PageReport) {
     let listItems = '';
 
     for (const broken of pageReport.broken) {
-        listItems += `<li>"${pageReport.brokenLinkTitles.get(broken)}" - ${broken}</li>`;
+        const info = pageReport.brokenInfo.get(broken);
+        const linkText = info?.linkText || "Link text unknown";
+        const breakageReason = info?.reason || "Reason for breaking is unknown";
+
+        listItems += `<li>"${linkText}" - ${broken} (${breakageReason})</li>`;
     }
 
     return `<li>${pageIntro}${buildSummaryLine(pageReport)}<h4>Broken Links:</h4><ul>${listItems}</ul></li>`;

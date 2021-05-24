@@ -47,7 +47,7 @@ export function handleLink(result: any, customData: CustomData) {
         pageReport.reportIgnored(linkUrl);
     } else if (result.broken && !blacklisted) {
         // a broken link worth reporting
-        pageReport.reportBroken(linkUrl, result.html.text);
+        pageReport.reportBroken(linkUrl, result.html.text, result.brokenReason);
     }
 
     customData.pageReports.set(sourceUrl, pageReport);
