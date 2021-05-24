@@ -2,9 +2,10 @@
   "name": "blog-link-checker",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.ts",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,14 @@
     "emailjs": "^3.4.0"
   },
   "bin": {
-    "link-checker": "./index.js"
+    "link-checker": "index.ts"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "@types/node": "^15.6.0",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.6",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.2.4"
   }
 }
