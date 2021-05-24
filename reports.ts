@@ -1,4 +1,4 @@
-export interface BrokenInformation {
+export interface BreakageInformation {
     linkText: string;
     reason?: string;
 }
@@ -7,7 +7,7 @@ export class PageReport {
     readonly url: string;
     checked: Set<string>;
     broken: Set<string>;
-    brokenInfo: Map<string, BrokenInformation>;
+    brokenInfo: Map<string, BreakageInformation>;
     ignored: Set<string>;
     blacklisted: Set<string>;
 
@@ -15,7 +15,7 @@ export class PageReport {
         this.url = url;
         this.checked = new Set<string>();
         this.broken = new Set<string>();
-        this.brokenInfo = new Map<string, BrokenInformation>();
+        this.brokenInfo = new Map<string, BreakageInformation>();
         this.ignored = new Set<string>();
         this.blacklisted = new Set<string>();
     }
