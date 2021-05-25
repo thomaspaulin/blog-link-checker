@@ -35,33 +35,42 @@ export function handleLink(result: any, customData: CustomData) {
         pageReport = new PageReport(sourceUrl);
     }
 
-    pageReport.reportChecked(linkUrl);
-    const blacklisted = isBlacklisted(result.url.parsed.host, customData.blacklist);
-    const ignored = isIgnorable(linkUrl, customData.ignorableLinks);
+    try {
+        pageReport.reportChecked(linkUrl);
+        const blacklisted = isBlacklisted(result.url.parsed.host, customData.blacklist);
+        const ignored = isIgnorable(linkUrl, customData.ignorableLinks);
 
-    if (blacklisted) {
-        // we're considering this host reliable, don't even consider checking it
-        pageReport.reportBlacklisted(linkUrl);
-    } else if (result.broken && !blacklisted && ignored) {
-        // e.g., a link which has broken in the past but we decided not to address for any number of reasons
-        pageReport.reportIgnored(linkUrl);
-    } else if (result.broken && !blacklisted) {
-        // a broken link worth reporting
-        pageReport.reportBroken(linkUrl, result.html.text, result.brokenReason);
+        if (blacklisted) {
+            // we're considering this host reliable, don't even consider checking it
+            pageReport.reportBlacklisted(linkUrl);
+        } else if (result.broken && !blacklisted && ignored) {
+            // e.g., a link which has broken in the past but we decided not to address for any number of reasons
+            pageReport.reportIgnored(linkUrl);
+        } else if (result.broken && !blacklisted) {
+            // a broken link worth reporting
+            pageReport.reportBroken(linkUrl, result.html.text, result.brokenReason);
+        }
+    } catch (e) {
+        console.error("I encountered an error, logging it and proceeding");
+        console.error(e)
+        pageReport.errors.add(e);
     }
 
     customData.pageReports.set(sourceUrl, pageReport);
 }
 
 function handlePage(error: any, pageUrl: string, customData: CustomData) {
-    if (!error) {
-        const pageReport = customData.pageReports.get(pageUrl);
-        if (pageReport) {
-            customData.report.savePageReport(pageReport);
-        }
-    } else {
-        console.error(error);
+    let pageReport = customData.pageReports.get(pageUrl);
+    if (!pageReport) {
+        pageReport = new PageReport(pageUrl);
     }
+    if (!error) {
+        customData.report.savePageReport(pageReport);
+    } else {
+        pageReport.reportError(error);
+    }
+
+    customData.pageReports.set(pageUrl, pageReport);
 }
 
 function printUsage() {

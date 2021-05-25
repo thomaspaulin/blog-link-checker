@@ -1,4 +1,4 @@
-import {SMTPClient, Message} from "emailjs";
+import {SMTPClient, Message, MessageHeaders, MessageAttachment} from "emailjs";
 import {CheckerReport, PageReport} from "./reports";
 
 export class SenderDetails {
@@ -57,7 +57,7 @@ export function buildPageSummary(pageUrl: string, pageReport: PageReport) {
 
 function buildEmailTemplate(report: CheckerReport) {
     const site = report.baseUrl;
-    const header = `<html lang="en"><head><title>Broken links found while parsing ${site}</title><style>.no-bullets { list-style-type: none; } .no-bullets > li { margin-bottom: 1.5em; } li > h5 { margin: 1em 0 1em 0; }</style></head>`;
+    const header = `<html lang="en"><head><title>Broken links found while parsing ${site}</title><style>.no-bullets { list-style-type: none; } .no-bullets > li { margin-bottom: 1.5em; } li > h5 { margin: 1em 0 1em 0; }</style></head><body>`;
     const intro = `${header}Hi there,<br><p>I found the following broken links when scanning <a href="${site}">${site}</a>.</p>`;
     let html = `${intro}<ul class="no-bullets">`;
     for (const [pageUrl , pageReport] of report.pageReports) {
@@ -65,8 +65,31 @@ function buildEmailTemplate(report: CheckerReport) {
             html += buildPageSummary(pageUrl, pageReport);
         }
     }
-    html += '</ul><p>Thanks,<br>broken-link-checker</p></html>';
+    html += '</ul><p>Thanks,<br>broken-link-checker</p></body></html>';
     return html;
+}
+
+export function buildErrorReport(report: CheckerReport): MessageAttachment {
+    let data = `<html lang="en"><head><title>Errors Reported When Checking ${report.baseUrl}</title></head><body>`;
+
+    data += `<h1>Errors Reported When Checking ${report.baseUrl}</h1>`;
+
+    for (const [k, v] of report.pageReports) {
+        data += `<p><h2>${k}</h2><ul>`;
+        for (const e of v.errors) {
+            data += `<li><pre>${e.stack}</pre></li>`;
+        }
+        data += `</ul></p>`;
+    }
+
+    data += "</body></html>"
+
+    return {
+        name: "reported-errors.html",
+        type: "text/html",
+        charset: "utf-8",
+        data: data,
+    }
 }
 
 export function email(senderDetails: SenderDetails, recipient: string, report: CheckerReport) {
@@ -79,13 +102,22 @@ export function email(senderDetails: SenderDetails, recipient: string, report: C
 
     const htmlString = buildEmailTemplate(report);
 
-    const headers = {
+    let attachment;
+    if (report.encounteredErrors()) {
+        attachment = buildErrorReport(report);
+    }
+
+    const headers: Partial<MessageHeaders> = {
         from: 'broken-link-checker <' + senderDetails.email + '>',
         to: recipient,
         "content-type": 'text/html; charset=UTF-8',
         subject: 'Broken links found while parsing ' + report.baseUrl,
-        text: htmlString
+        text: htmlString,
     };
+
+    if (attachment) {
+        headers.attachment = attachment;
+    }
 
     client.send(new Message(headers),
         (err, message) => {

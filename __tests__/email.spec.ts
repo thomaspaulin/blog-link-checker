@@ -1,7 +1,7 @@
 "use strict";
 
-import {PageReport} from "../reports";
-import {buildPageSummary} from "../email";
+import {PageReport, CheckerReport} from "../reports";
+import {buildErrorReport, buildPageSummary} from "../email";
 import exp from "constants";
 
 describe("Email sending and formatting", () => {
@@ -142,5 +142,34 @@ describe("Email sending and formatting", () => {
             const summary = buildPageSummary(url, pr);
             expect(summary).toMatch(`<li>"link title" - ${l} (HTTP_404)</li>`);
         });
+    });
+
+    describe("The error report", () => {
+        let cr: CheckerReport;
+        let pr: PageReport;
+        let e: Error;
+
+        beforeEach(() => {
+            cr = new CheckerReport(url);
+            pr = new PageReport(l);
+            e = new Error("test error");
+        });
+
+       it("should have one header per page, and one list item per error with the stack track printed", () => {
+           pr.reportError(e);
+           cr.savePageReport(pr);
+
+           const errorReport = buildErrorReport(cr);
+           expect(errorReport.data).toMatch(`<h1>Errors Reported When Checking ${url}</h1>`);
+           expect(errorReport.data).toMatch(`<h2>${l}</h2>`);
+           expect(errorReport.data).toMatch("test error");
+       });
+
+       it("should be an attachment with the filename of 'reported-errors.html'", () => {
+           pr.reportError(e);
+
+           const errorReport = buildErrorReport(cr);
+           expect(errorReport.name).toMatch("reported-errors.html");
+       });
     });
 });

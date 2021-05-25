@@ -10,6 +10,7 @@ export class PageReport {
     brokenInfo: Map<string, BreakageInformation>;
     ignored: Set<string>;
     blacklisted: Set<string>;
+    errors: Set<Error>;
 
     constructor(url: string) {
         this.url = url;
@@ -18,6 +19,7 @@ export class PageReport {
         this.brokenInfo = new Map<string, BreakageInformation>();
         this.ignored = new Set<string>();
         this.blacklisted = new Set<string>();
+        this.errors = new Set<Error>();
     }
 
     reportBroken(link: string, linkText: string, reason: string) {
@@ -42,6 +44,10 @@ export class PageReport {
     reportChecked(link: string) {
         this.checked.add(link);
     }
+
+    reportError(error: Error) {
+        this.errors.add(error);
+    }
 }
 
 export class CheckerReport {
@@ -59,10 +65,18 @@ export class CheckerReport {
         }
     }
 
-    areBrokenLinksPresent() {
+    areBrokenLinksPresent(): boolean {
         let ok = true;
         for (const report of this.pageReports.values()) {
             ok = ok && report.broken.size === 0;
+        }
+        return !ok;
+    }
+
+    encounteredErrors(): boolean {
+        let ok = true;
+        for (const pageReport of this.pageReports.values()) {
+            ok = ok && pageReport.errors.size === 0;
         }
         return !ok;
     }
