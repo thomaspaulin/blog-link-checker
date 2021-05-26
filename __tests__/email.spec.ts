@@ -165,11 +165,11 @@ describe("Email sending and formatting", () => {
            expect(errorReport.data).toMatch("test error");
        });
 
-       it("should be an attachment with the filename of 'error-report.html'", () => {
+       it("should be an attachment with the filename of 'reported-errors.html'", () => {
            pr.reportError(e);
 
            const errorReport = buildErrorReport(cr);
-           expect(errorReport.name).toMatch("error-report.html");
+           expect(errorReport.name).toMatch("reported-errors.html");
        });
     });
 
