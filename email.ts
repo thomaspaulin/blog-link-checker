@@ -92,14 +92,7 @@ export function buildErrorReport(report: CheckerReport): MessageAttachment {
     }
 }
 
-export function email(senderDetails: SenderDetails, recipient: string, report: CheckerReport) {
-    const client = new SMTPClient({
-        user: senderDetails.email,
-        password: senderDetails.password,
-        host: 'smtp.gmail.com',
-        ssl: true,
-    });
-
+export function buildEmail(senderDetails: SenderDetails, recipient: string, report: CheckerReport): Message {
     const htmlString = buildEmailTemplate(report);
 
     let attachment;
@@ -119,7 +112,18 @@ export function email(senderDetails: SenderDetails, recipient: string, report: C
         headers.attachment = attachment;
     }
 
-    client.send(new Message(headers),
+    return new Message(headers);
+}
+
+export function sendEmail(senderDetails: SenderDetails, recipient: string, report: CheckerReport) {
+    const client = new SMTPClient({
+        user: senderDetails.email,
+        password: senderDetails.password,
+        host: 'smtp.gmail.com',
+        ssl: true,
+    });
+
+    client.send(buildEmail(senderDetails, recipient, report),
         (err, message) => {
             console.log(err || message);
         }

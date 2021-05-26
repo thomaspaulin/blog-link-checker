@@ -3,7 +3,7 @@ import brokenLinkChecker from 'broken-link-checker';
 const {SiteChecker} = brokenLinkChecker;
 import argParser from "args-parser";
 
-import { SenderDetails, email } from "./email";
+import { SenderDetails, sendEmail } from "./email";
 import {CheckerReport, PageReport} from "./reports";
 
 
@@ -110,7 +110,7 @@ function main() {
         if (report.areBrokenLinksPresent()) {
             msg += "The following broke:"
             console.log(msg, report);
-            email(new SenderDetails(sender, senderPassword), recipient, report);
+            sendEmail(new SenderDetails(sender, senderPassword), recipient, report);
         } else {
             msg += "No broken links found.";
             console.log(msg);

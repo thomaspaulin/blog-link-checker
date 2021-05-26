@@ -1,7 +1,7 @@
 "use strict";
 
 import {PageReport, CheckerReport} from "../reports";
-import {buildErrorReport, buildPageSummary} from "../email";
+import {buildEmail, buildErrorReport, buildPageSummary, SenderDetails} from "../email";
 import exp from "constants";
 
 describe("Email sending and formatting", () => {
@@ -165,11 +165,71 @@ describe("Email sending and formatting", () => {
            expect(errorReport.data).toMatch("test error");
        });
 
-       it("should be an attachment with the filename of 'reported-errors.html'", () => {
+       it("should be an attachment with the filename of 'error-report.html'", () => {
            pr.reportError(e);
 
            const errorReport = buildErrorReport(cr);
-           expect(errorReport.name).toMatch("reported-errors.html");
+           expect(errorReport.name).toMatch("error-report.html");
        });
+    });
+
+    describe("Constructing the email", () => {
+        const recipient = "bar@example.com";
+
+        let sd: SenderDetails;
+        let cr: CheckerReport;
+        let e: Error;
+
+       beforeEach(() => {
+          sd = new SenderDetails("foo@example.com", "str0ng_p4ssword_r_us");
+           cr = new CheckerReport(url);
+           e = new Error("test error");
+       });
+
+        it("should be sent from the given sender", () => {
+           const email = buildEmail(sd, recipient, cr);
+           expect(email.header.from).toMatch("broken-link-checker");
+           expect(email.header.from).toMatch("<foo@example.com>");
+       });
+
+       it("should be sent to the given recipient", () => {
+           const email = buildEmail(sd, recipient, cr);
+           expect(email.header.to).toMatch(recipient);
+       });
+
+       it("should mention the site URL in the subject line", () => {
+           const email = buildEmail(sd, recipient, cr);
+           // the transforms do some encoding. For now checking for this path is good enough
+           // todo match the encoding to have a more representational test
+           expect(email.header.subject).toMatch(`2021/03/deckgl-displaying-live-flight-info/`);
+       });
+
+       it("should add the HTML body as the message data", () => {
+           const pr = new PageReport(l);
+           pr.reportChecked(l2);
+           pr.reportBroken(l3, "title", "HTTP_404");
+           cr.savePageReport(pr)
+          const email = buildEmail(sd, recipient, cr);
+          const html = buildPageSummary(l, pr);
+
+          expect(email.text).toMatch(html);
+       });
+
+        it("should add a text file attachment with the stack traces for any errors encountered", () => {
+            const pr = new PageReport(l);
+            // hack to represent an error occurred
+            pr.errors.add(e);
+            cr.savePageReport(pr);
+            const email = buildEmail(sd, recipient, cr);
+
+            expect(email.attachments.length).toEqual(1);
+            expect(email.attachments[0].name).toEqual("reported-errors.html");
+            expect(email.attachments[0].data).toMatch(e.message);
+        });
+
+        it("should not attach a text file for errors if none were encountered", () => {
+            const email = buildEmail(sd, recipient, cr);
+            expect(email.attachments.length).toEqual(0);
+        });
     });
 });
