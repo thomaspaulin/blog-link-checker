@@ -52,7 +52,7 @@ export function buildPageSummary(pageUrl: string, pageReport: PageReport) {
         listItems += `<li>"${linkText}" - ${broken} (${breakageReason})</li>`;
     }
 
-    return `<li>${pageIntro}${buildSummaryLine(pageReport)}<h4>Broken Links:</h4><ul>${listItems}</ul></li>`;
+    return `<li>${pageIntro}${buildSummaryLine(pageReport)}<h4>Broken Links:</h4><ul>${listItems}</ul></li><hr>`;
 }
 
 function buildEmailTemplate(report: CheckerReport) {
