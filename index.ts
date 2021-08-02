@@ -1,4 +1,5 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env ts-node-script
+// ts-node-script per cspotcode's comment at https://github.com/TypeStrong/ts-node/issues/995#issuecomment-608936912
 import {checkLinks} from "./checker";
 import argParser from "args-parser";
 import {SenderDetails} from "./email";
