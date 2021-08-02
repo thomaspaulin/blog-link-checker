@@ -16,7 +16,7 @@
     "emailjs": "^3.4.0"
   },
   "bin": {
-    "link-checker": "index.ts"
+    "blog-link-checker": "index.ts"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
