@@ -58,10 +58,20 @@ export function buildPageSummary(pageUrl: string, pageReport: PageReport) {
     return `<li>${pageIntro}${buildSummaryLine(pageReport)}<h4>Broken Links:</h4><ul>${listItems}</ul></li><hr>`;
 }
 
-function buildEmailTemplate(report: CheckerReport) {
+export function buildEmailTemplate(report: CheckerReport) {
     const site = report.baseUrl;
     const header = `<html lang="en"><head><title>Broken links found while parsing ${site}</title><style>.no-bullets { list-style-type: none; } .no-bullets > li { margin-bottom: 1.5em; } li > h5 { margin: 1em 0 1em 0; }</style></head><body>`;
-    const intro = `${header}Hi there,<br><p>I found the following broken links when scanning <a href="${site}">${site}</a>.</p>`;
+
+    let scannedPageCount = 0;
+    let totalCheckedCount = 0;
+    let totalBrokenCount = 0;
+    for (const [, pageReport] of report.pageReports) {
+        scannedPageCount++;
+        totalCheckedCount += pageReport?.checked?.size || 0;
+        totalBrokenCount += pageReport?.broken?.size || 0;
+    }
+
+    const intro = `${header}Hi there,<br><p>I scanned <a href="${site}">${site}</a>. In doing so I scanned <strong>${scannedPageCount}</strong> pages which contained a total of <strong>${totalCheckedCount}</strong> links. Of these, <strong>${totalBrokenCount}</strong> were broken links.</p>`;
     let html = `${intro}<ul class="no-bullets">`;
     for (const [pageUrl , pageReport] of report.pageReports) {
         if (pageReport.broken.size > 0) {

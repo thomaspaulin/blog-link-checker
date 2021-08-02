@@ -1,8 +1,7 @@
 "use strict";
 
-import {PageReport, CheckerReport} from "../reports";
-import {buildEmail, buildErrorReport, buildPageSummary, SenderDetails} from "../email";
-import exp from "constants";
+import {CheckerReport, PageReport} from "../reports";
+import {buildEmail, buildEmailTemplate, buildErrorReport, buildPageSummary, SenderDetails} from "../email";
 
 describe("Email sending and formatting", () => {
     const url = "http://localhost:1313/2021/03/deckgl-displaying-live-flight-info/";
@@ -10,7 +9,50 @@ describe("Email sending and formatting", () => {
     const l2 = "https://cors-anywhere.herokuapp.com/";
     const l3 = "https://hgis.uw.edu/";
     const l4 = "https://www.colourhunt.com/palettadsfe/cjf74j2eqdg3w0119my22vt6f/";
-    const l5 = "https://www.awix.com/blog/2017/10/how-to-choose-the-perfect-color-palette-for-your-business";
+
+    const url2 = "http://localhost:1313/2021/07/ullage-rockets/";
+    const u2_l = "https://en.wikipedia.org/wiki/Saturn_V";
+    const u2_l2 = "https://en.wikipedia.org/wiki/Ullage_motor";
+    const u2_l3 = "https://en.wikipedia.org/wiki/Ullage_(wine)";
+    const u2_l4 = "https://unece.org/DAM/trans/doc/2011/wp29grpe/LNG_TF-02-06e.pdf";
+
+    describe("The introduction", () => {
+        const cr = new CheckerReport("http://localhost:1313");
+
+        beforeEach(() => {
+            const pr = new PageReport(url);
+            pr.reportChecked(l);
+            pr.reportChecked(l2);
+            pr.reportChecked(l3);
+
+            pr.reportBroken(l, "title", "HTTP_404");
+            cr.savePageReport(pr);
+
+            const pr2 = new PageReport(url2)
+            pr2.reportChecked(u2_l);
+            pr2.reportChecked(u2_l2);
+            pr2.reportChecked(u2_l3);
+            pr2.reportChecked(u2_l4);
+
+            pr2.reportBroken(u2_l2, "ullage rockets", "HTTP_403");
+            cr.savePageReport(pr2);
+        });
+
+        it("should mention how many pages were scanned", () => {
+            const template = buildEmailTemplate(cr);
+            expect(template).toContain("In doing so I scanned <strong>2</strong> pages");
+        });
+
+        it("should mention how many links were checked across all pages", () => {
+            const template = buildEmailTemplate(cr);
+            expect(template).toContain("which contained a total of <strong>7</strong> links")
+        });
+
+        it("should mention how many links broken across all pages", () => {
+            const template = buildEmailTemplate(cr);
+            expect(template).toContain(" links. Of these, <strong>2</strong> were broken links")
+        });
+    });
 
     describe("The summary line for a page", () => {
         describe("when reporting how many links checked", () => {
