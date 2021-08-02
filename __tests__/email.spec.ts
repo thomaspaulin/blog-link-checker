@@ -52,6 +52,28 @@ describe("Email sending and formatting", () => {
             const template = buildEmailTemplate(cr);
             expect(template).toContain(" links. Of these, <strong>2</strong> were broken links")
         });
+
+        describe("should mention the scan duration", () => {
+            it("should mention the time in milliseconds", () => {
+                const start = new Date();
+                const end = new Date(start.getTime() + 100);
+                const localCr = new CheckerReport(url);
+                localCr.setStartTime(start);
+                localCr.setEndTime(end)
+                const template = buildEmailTemplate(localCr);
+                expect(template).toContain("The scan took <strong>100ms</strong>.");
+            });
+
+            it("should use -1 if there's no end time", () => {
+                // because a -1 duration is not possible and signals something off like the times are not present, or
+                // time when backwards.
+                const start = new Date();
+                const localCr = new CheckerReport(url);
+                localCr.setStartTime(start);
+                const template = buildEmailTemplate(localCr);
+                expect(template).toContain("The scan took <strong>-1ms</strong>.");
+            });
+        });
     });
 
     describe("The summary line for a page", () => {

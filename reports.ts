@@ -54,9 +54,27 @@ export class CheckerReport {
     readonly baseUrl: string;
     pageReports: Map<string, PageReport>;
 
+    startedAt: Date | undefined;
+    finishedAt: Date | undefined;
+
     constructor(baseUrl: string) {
         this.baseUrl = baseUrl;
         this.pageReports = new Map<string, PageReport>();
+    }
+
+    setStartTime(d: Date) {
+        this.startedAt = d;
+    }
+
+    setEndTime(d: Date) {
+        this.finishedAt = d;
+    }
+
+    getDuration() {
+        if (!this.finishedAt || !this.startedAt) {
+            return -1
+        }
+        return this.finishedAt?.getTime() - this.startedAt?.getTime();
     }
 
     savePageReport(pageReport: PageReport) {

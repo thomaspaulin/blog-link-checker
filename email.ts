@@ -71,7 +71,7 @@ export function buildEmailTemplate(report: CheckerReport) {
         totalBrokenCount += pageReport?.broken?.size || 0;
     }
 
-    const intro = `${header}Hi there,<br><p>I scanned <a href="${site}">${site}</a>. In doing so I scanned <strong>${scannedPageCount}</strong> pages which contained a total of <strong>${totalCheckedCount}</strong> links. Of these, <strong>${totalBrokenCount}</strong> were broken links.</p>`;
+    const intro = `${header}Hi there,<br><p>I scanned <a href="${site}">${site}</a>. In doing so I scanned <strong>${scannedPageCount}</strong> pages which contained a total of <strong>${totalCheckedCount}</strong> links. Of these, <strong>${totalBrokenCount}</strong> were broken links. The scan took <strong>${report.getDuration()}ms</strong>.</p>`;
     let html = `${intro}<ul class="no-bullets">`;
     for (const [pageUrl , pageReport] of report.pageReports) {
         if (pageReport.broken.size > 0) {

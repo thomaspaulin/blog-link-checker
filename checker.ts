@@ -75,7 +75,11 @@ export function handlePage(error: any, pageUrl: string, customData: CustomData) 
 export function checkLinks(siteUrl: string, recipient: string, sender: SenderDetails, blacklist: Set<string>, ignoreList: Set<string>, timeout: number) {
     let timeoutTimer: NodeJS.Timeout;
 
+    const report = new CheckerReport(siteUrl);
+    report.setStartTime(new Date());
+
     function handleCheckCompletion() {
+        report.setEndTime(new Date());
         clearTimeout(timeoutTimer);
         let msg = "Checks completed. ";
         if (report.areBrokenLinksPresent()) {
@@ -88,7 +92,6 @@ export function checkLinks(siteUrl: string, recipient: string, sender: SenderDet
         }
     }
 
-    const report = new CheckerReport(siteUrl)
     const options = {
         acceptedSchemes: ["http", "https"],
         cacheExpiryTime: 3600000,
