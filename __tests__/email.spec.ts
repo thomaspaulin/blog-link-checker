@@ -140,7 +140,7 @@ describe("Email sending and formatting", () => {
             const pr = new PageReport(url);
             pr.reportBroken(l, "link title", "HTTP_404");
             const summary = buildPageSummary(url, pr);
-            expect(summary).toMatch(`<li>"link title" - ${l} (HTTP_404)</li>`);
+            expect(summary).toMatch(`<li>"link title" - <a href="${l}">${l}</a> (HTTP_404)</li>`);
         });
     });
 
