@@ -49,7 +49,10 @@ export function buildPageSummary(pageUrl: string, pageReport: PageReport) {
         const linkText = info?.linkText || "Link text unknown";
         const breakageReason = info?.reason || "Reason for breaking is unknown";
 
-        listItems += `<li>"${linkText}" - ${broken} (${breakageReason})</li>`;
+        // Ordinarily, it wouldn't make sense to link to a broken link, but in this case there are a fair number of
+        // false positives until I iron out the kinks in the system. As such it's much more convenient to have the
+        // hyperlink present in the email so I can investigate whether or not it is indeed broken.
+        listItems += `<li>"${linkText}" - <a href="${broken}">${broken}</a> (${breakageReason})</li>`;
     }
 
     return `<li>${pageIntro}${buildSummaryLine(pageReport)}<h4>Broken Links:</h4><ul>${listItems}</ul></li><hr>`;
